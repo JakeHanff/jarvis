@@ -1,0 +1,324 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Everything visual reads from these variables, so themes, accents,
+ * wallpaper and density are data (stored in settings), not hard-coded styles.
+ * Runtime values (--accent, --glass, --blur, --dim, --wallpaper) are set by
+ * SettingsProvider; the defaults below cover first paint.
+ */
+:root {
+  --accent: #5eead4;
+  --accent-rgb: 94 234 212;
+  --glass: 0.55;
+  --blur: 18px;
+  --dim: 0.15;
+  --wallpaper: none;
+  --radius: 18px;
+  --gap: 16px;
+  --pad: 18px;
+
+  /* dark (default) */
+  --bg: #06080e;
+  --surface-rgb: 14 18 28;
+  --text: #e8ecf4;
+  --muted: #8b94a7;
+  --faint: #5a6275;
+  --line: rgb(255 255 255 / 0.08);
+  --line-strong: rgb(255 255 255 / 0.14);
+  --hover: rgb(255 255 255 / 0.05);
+  --danger: #fb7185;
+  --warn: #fbbf24;
+  --ok: #4ade80;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #eef1f6;
+  --surface-rgb: 255 255 255;
+  --text: #121621;
+  --muted: #5a6274;
+  --faint: #8d95a6;
+  --line: rgb(15 23 42 / 0.08);
+  --line-strong: rgb(15 23 42 / 0.16);
+  --hover: rgb(15 23 42 / 0.04);
+  --danger: #e11d48;
+  --warn: #b45309;
+  --ok: #15803d;
+  color-scheme: light;
+}
+
+:root[data-density="compact"] {
+  --gap: 10px;
+  --pad: 13px;
+  --radius: 14px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-hover: var(--hover);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+  --color-ok: var(--ok);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-space), var(--font-geist-sans), ui-sans-serif, system-ui;
+}
+
+/* Only <html> gets the base colour: a body background would paint over the
+   fixed wallpaper layer (z-index -1). */
+html {
+  background: var(--bg);
+}
+body {
+  color: var(--text);
+}
+
+body {
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Wallpaper lives on a fixed layer so content scrolls over it. */
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--wallpaper), var(--bg);
+}
+.wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / var(--dim));
+}
+:root[data-theme="light"] .wallpaper::after {
+  background: rgb(255 255 255 / var(--dim));
+}
+
+.glass {
+  background: rgb(var(--surface-rgb) / var(--glass));
+  backdrop-filter: blur(var(--blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.04) inset,
+    0 12px 40px -12px rgb(0 0 0 / 0.45);
+}
+:root[data-theme="light"] .glass {
+  box-shadow: 0 10px 30px -14px rgb(15 23 42 / 0.18);
+}
+
+.glass-strong {
+  background: rgb(var(--surface-rgb) / max(var(--glass), 0.88));
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.accent-soft {
+  background: rgb(var(--accent-rgb) / 0.14);
+  color: var(--accent);
+}
+.accent-ring:focus-visible,
+.field:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(var(--accent-rgb) / 0.45);
+}
+
+.field {
+  background: var(--hover);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 7px 10px;
+  color: var(--text);
+  font-size: 14px;
+  min-width: 0;
+}
+.field::placeholder {
+  color: var(--faint);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  padding: 6px 11px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  background: var(--hover);
+  color: var(--text);
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.btn:hover {
+  border-color: var(--line-strong);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: #061016;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background: var(--hover);
+}
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s;
+}
+.icon-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 600;
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+/* Rendered assistant markdown */
+.prose-jarvis {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.prose-jarvis > * + * {
+  margin-top: 0.6em;
+}
+.prose-jarvis h1,
+.prose-jarvis h2,
+.prose-jarvis h3 {
+  font-weight: 600;
+  margin-top: 0.9em;
+}
+.prose-jarvis ul {
+  list-style: disc;
+  padding-left: 1.2em;
+}
+.prose-jarvis ol {
+  list-style: decimal;
+  padding-left: 1.3em;
+}
+.prose-jarvis code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--hover);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.05em 0.35em;
+}
+.prose-jarvis pre {
+  background: rgb(0 0 0 / 0.25);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  overflow-x: auto;
+}
+.prose-jarvis pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.prose-jarvis a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-jarvis table {
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.prose-jarvis th,
+.prose-jarvis td {
+  border: 1px solid var(--line);
+  padding: 4px 8px;
+}
+.prose-jarvis blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 10px;
+  color: var(--muted);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.35s ease-out both;
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.typing span {
+  animation: pulse-dot 1.2s infinite;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .typing span {
+    animation: none;
+  }
+}
