@@ -96,7 +96,8 @@ v0.1 can already use a cloud Postgres database instead of the local file:
    ```
    DATABASE_URL=postgresql+psycopg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
    ```
-4. Restart JARVIS. Tables are created automatically, with row-level security switched on so Supabase's public API can't read them.
+4. Install the Postgres driver (once): `services\\api\\.venv\\Scripts\\python -m pip install -r services/api/requirements-postgres.txt`
+5. Restart JARVIS. Tables are created automatically, with row-level security switched on so Supabase's public API can't read them.
 
 This moves your *data* to the cloud. For your phone to reach JARVIS when the laptop is off, the backend and frontend also need to be hosted — that's the next milestone (see ROADMAP.md). Existing local data is not migrated automatically yet; use **Settings → Export** first if you want to keep it.
 

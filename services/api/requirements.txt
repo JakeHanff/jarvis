@@ -6,4 +6,3 @@ anthropic==2.8.0
 httpx==0.28.1
 python-multipart==0.0.33
 tzdata==2026.6
-psycopg[binary]==3.2.10
