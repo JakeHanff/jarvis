@@ -149,20 +149,67 @@ class OpenAIProvider:
         )
 
 
+class OllamaProvider:
+    """Local models through Ollama's native chat API. Free; runs on this computer."""
+
+    name = "ollama"
+
+    def __init__(self, s: Settings):
+        self.model = s.ollama_model
+        self.base = s.ollama_base_url.rstrip("/")
+        self.context = s.ollama_context
+
+    async def complete(self, stable_system, dynamic_system, turns, max_tokens=16000):
+        messages = [{"role": "system", "content": stable_system + "\n\n" + dynamic_system}]
+        messages += [{"role": t.role, "content": t.content} for t in turns]
+        body = {
+            "model": self.model,
+            "messages": messages,
+            "stream": False,
+            "options": {"num_ctx": self.context, "num_predict": min(max_tokens, 4096)},
+        }
+        try:
+            # Local models on a laptop can be slow, especially the first reply (model loading).
+            async with httpx.AsyncClient(timeout=httpx.Timeout(600, connect=5)) as c:
+                r = await c.post(f"{self.base}/api/chat", json=body)
+        except httpx.ConnectError:
+            raise ProviderError(
+                "Can't reach Ollama. Is it running? (Open the Ollama app, or run `ollama serve`.)", retryable=True
+            ) from None
+        except httpx.TimeoutException:
+            raise ProviderError("The local model took too long to answer. Try a smaller model.", retryable=True) from None
+        except httpx.HTTPError:
+            raise ProviderError("Error talking to Ollama.", retryable=True) from None
+        if r.status_code == 404:
+            raise ProviderError(
+                f"Ollama doesn't have the model '{self.model}'. Run: ollama pull {self.model}"
+            )
+        if r.status_code >= 400:
+            raise ProviderError(f"Ollama error {r.status_code}: {r.text[:300]}", retryable=r.status_code >= 500)
+        data = r.json()
+        notes = ["Reply was cut off at the token limit."] if data.get("done_reason") == "length" else []
+        return ProviderResult(
+            text=(data.get("message") or {}).get("content") or "",
+            provider=self.name,
+            model=data.get("model", self.model),
+            stop_reason=data.get("done_reason"),
+            usage={"input_tokens": data.get("prompt_eval_count"), "output_tokens": data.get("eval_count")},
+            notes=notes,
+        )
+
+
 def provider_status(s: Settings | None = None) -> dict[str, Any]:
     s = s or get_settings()
     anthropic_ok = bool(s.anthropic_api_key)
     openai_ok = bool(s.openai_api_key and s.openai_model)
+    ollama_ok = bool(s.ollama_model)
     choice = s.jarvis_ai_provider.lower()
+    ok = {"anthropic": anthropic_ok, "openai": openai_ok, "ollama": ollama_ok}
     if choice == "auto":
-        active = "anthropic" if anthropic_ok else "openai" if openai_ok else None
-    elif choice == "anthropic":
-        active = "anthropic" if anthropic_ok else None
-    elif choice == "openai":
-        active = "openai" if openai_ok else None
+        active = next((name for name in ("anthropic", "openai", "ollama") if ok[name]), None)
     else:
-        active = None
-    model = s.anthropic_model if active == "anthropic" else s.openai_model if active == "openai" else None
+        active = choice if ok.get(choice) else None
+    model = {"anthropic": s.anthropic_model, "openai": s.openai_model, "ollama": s.ollama_model}.get(active or "")
     return {
         "configured": active is not None,
         "active": active,
@@ -170,6 +217,7 @@ def provider_status(s: Settings | None = None) -> dict[str, Any]:
         "requested": choice,
         "anthropic_key_present": anthropic_ok,
         "openai_configured": openai_ok,
+        "ollama_configured": ollama_ok,
     }
 
 
@@ -180,4 +228,6 @@ def get_provider(s: Settings | None = None) -> ChatProvider | None:
         return AnthropicProvider(s)
     if active == "openai":
         return OpenAIProvider(s)
+    if active == "ollama":
+        return OllamaProvider(s)
     return None

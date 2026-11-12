@@ -48,8 +48,8 @@ async def chat(body: ChatIn, db: Session = Depends(get_db), user: str = Depends(
             503,
             {
                 "code": "ai_not_configured",
-                "message": "No AI model is configured. Add ANTHROPIC_API_KEY (or OPENAI_API_KEY + OPENAI_MODEL) "
-                "to the .env file and restart the backend. Nothing was sent.",
+                "message": "No AI model is configured. Set one up in the .env file (free option: Ollama with "
+                "OLLAMA_MODEL, or ANTHROPIC_API_KEY for Claude) and restart JARVIS. Nothing was sent.",
                 "status": st,
             },
         )

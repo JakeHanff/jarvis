@@ -183,8 +183,9 @@ export default function SettingsPage() {
               <Row k="Model" v={<code className="font-mono text-[12px]">{status.ai.model ?? "—"}</code>} />
               {!status.ai.configured && (
                 <p className="text-[13px] text-muted">
-                  Put <code className="font-mono">ANTHROPIC_API_KEY=…</code> in the <code className="font-mono">.env</code> file at the project root, then restart JARVIS. Keys are only ever
-                  read by the backend.
+                  Free: install Ollama, run <code className="font-mono">ollama pull llama3.2</code>, then set <code className="font-mono">JARVIS_AI_PROVIDER=ollama</code> and{" "}
+                  <code className="font-mono">OLLAMA_MODEL=llama3.2</code> in <code className="font-mono">.env</code>. Or use Claude with <code className="font-mono">ANTHROPIC_API_KEY</code>. Restart
+                  JARVIS afterwards. Keys are only ever read by the backend.
                 </p>
               )}
             </>

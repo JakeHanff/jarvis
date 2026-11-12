@@ -37,8 +37,8 @@ class Settings(BaseSettings):
     jarvis_user_id: str = "local-user"
 
     # --- AI providers ------------------------------------------------------
-    # "auto" picks anthropic if ANTHROPIC_API_KEY is set, else openai if configured.
-    jarvis_ai_provider: str = "auto"  # auto | anthropic | openai | none
+    # "auto" picks anthropic if ANTHROPIC_API_KEY is set, else openai, else ollama if configured.
+    jarvis_ai_provider: str = "auto"  # auto | anthropic | openai | ollama | none
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-opus-5-5"
     anthropic_effort: str = "medium"  # low | medium | high | xhigh | max
@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_model: str = ""  # must be set explicitly to use OpenAI
     openai_base_url: str = "https://api.openai.com/v1"
+    # Free, local models via Ollama (https://ollama.com). No key needed.
+    ollama_model: str = ""  # e.g. llama3.2 - must be pulled first: `ollama pull llama3.2`
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_context: int = 8192  # tokens; Ollama's default is too small for JARVIS's context
 
     # --- Uploads -----------------------------------------------------------
     max_upload_mb: int = 8

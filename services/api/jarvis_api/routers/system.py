@@ -181,7 +181,7 @@ def insights(tz: str | None = None, db: Session = Depends(get_db), user: str = D
     if not provider_status()["configured"]:
         items.append({
             "id": "ai_off", "severity": "setup", "title": "AI model not connected",
-            "detail": "Add ANTHROPIC_API_KEY to .env and restart the backend to enable chat.",
+            "detail": "Set up a model in .env (free: Ollama; or Claude) and restart JARVIS. See README.",
             "reason": "No provider configured.", "link": "settings",
         })
     return items

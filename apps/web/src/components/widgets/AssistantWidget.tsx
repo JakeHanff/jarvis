@@ -197,8 +197,8 @@ export function AssistantWidget(props: WidgetProps) {
         <div className="mb-2 flex gap-2 rounded-lg border border-line bg-hover px-3 py-2 text-[12px] text-muted">
           <AlertCircle size={14} className="mt-0.5 shrink-0 text-warn" />
           <span>
-            <b className="text-fg">AI model not connected.</b> Add <code className="font-mono">ANTHROPIC_API_KEY</code> to <code className="font-mono">.env</code> and restart the
-            backend. Everything else on the dashboard works without it.
+            <b className="text-fg">AI model not connected.</b> Set one up in <code className="font-mono">.env</code> — free with Ollama, or Claude with an API key (see
+            README) — then restart JARVIS. Everything else on the dashboard works without it.
           </span>
         </div>
       )}

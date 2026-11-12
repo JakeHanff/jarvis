@@ -18,7 +18,7 @@
 
 ### Implemented
 - **Backend (FastAPI):** tasks, memories (6 layers, provenance, confidence, verification, status lifecycle, supersede, correction history), conversations/messages, local calendar events, key/value settings, feedback, action log + approval queue, devices, image uploads, export, erase-all, memory import (profile/list/lines), ChatGPT `conversations.json` import, AI distillation of conversations into memory proposals, rule-based insights (overdue, due today, stale goals, review queue, stale memories, calendar overlaps, AI not configured), status endpoint, skill registry with 5 built-in skills.
-- **AI:** provider abstraction; Anthropic (official SDK, prompt caching, server-side refusal fallback, effort setting); OpenAI (HTTP, needs `OPENAI_MODEL`). Context = memories (labelled), open tasks, next 7 days of events, local time. Memory/task proposals require approval. Autonomy pause drops proposals.
+- **AI:** provider abstraction; **Ollama (free, local models)**; Anthropic (official SDK, prompt caching, server-side refusal fallback, effort setting); OpenAI (HTTP, needs `OPENAI_MODEL`). Context = memories (labelled), open tasks, next 7 days of events, local time. Memory/task proposals require approval. Autonomy pause drops proposals.
 - **Frontend (Next.js 15, React 19, Tailwind 4):** widget registry; drag-to-reorder, resize, hide/show; separate desktop/mobile layouts; Customise drawer; Memory page; Settings page (AI/storage status, access token, devices, autonomy + approvals, integrations status, imports, action log, export, erase); full-screen chat; per-message feedback; PWA manifest + icons; device heartbeat.
 - **Tooling:** `npm run setup | dev | dev:lan | start | test` (cross-platform Node scripts), `.env.example`, Supabase SQL migration with RLS enabled.
 
@@ -30,7 +30,7 @@
 
 ### Not yet verified
 - Running on Windows itself (scripts are written for it — `py -3`, `.cmd` shims, `taskkill` — but were only run on Linux).
-- A real chat reply with a valid API key.
+- A real chat reply with a valid API key, or with a real Ollama install (the Ollama provider was tested against a stand-in server that mimics Ollama's API; running the real Ollama binary in the build container was not permitted).
 - Postgres/Supabase mode (code path written, RLS statement included; not run against a real database).
 - Wallpaper upload through the UI button (the upload endpoint itself was tested: PNG accepted and served, text file rejected).
 
@@ -46,4 +46,5 @@
 See ROADMAP.md → "Next milestone: v0.2". The first decision needed from the user: where to host (and creating a Supabase project).
 
 ## Session log
+- **2026-11-12** — Fixed Windows setup on Python 3.15 (plain uvicorn; Postgres driver optional). Added free local-model option via Ollama, because the user wants no running costs.
 - **2026-11-11** — Project created. Phase 0 + Phase 1 complete, Phase 2 core (providers, memory, proposals, imports) in place.

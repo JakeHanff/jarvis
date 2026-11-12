@@ -34,3 +34,9 @@ Customisation follows the user across devices and is data, not code. Separate `d
 
 ### 2026-11-11 · `create_all` instead of migrations for now
 Fastest start. **Must switch to Alembic before the first change to an existing table.**
+
+### 2026-11-12 · Free local models via Ollama as a first-class provider
+The user doesn't want to pay for an API. Ollama runs open models on the laptop at no cost and keeps conversations local. Uses Ollama's native `/api/chat` so the context window (`num_ctx`, default 8192) can be raised; Ollama's own default is too small for JARVIS's memory context. *Trade-offs:* weaker reasoning and less reliable `<jarvis_proposals>` output than Claude (malformed blocks are already dropped safely); chat only works when the laptop is on. Switching back to Claude is one line in `.env`.
+
+### 2026-11-12 · Plain `uvicorn` and optional Postgres driver
+`uvicorn[standard]` pulled in PyYAML, which has no Windows wheel for Python 3.15 and needs a C compiler to build. JARVIS doesn't need those extras. `psycopg` moved to `requirements-postgres.txt`, which is installed only when using Supabase.

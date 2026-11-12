@@ -34,14 +34,23 @@ npm run setup
 
 `setup` creates a Python virtual environment, installs the backend and frontend dependencies and creates a `.env` file from `.env.example`.
 
-### 3. Connect the AI model (for chat)
+### 3. Connect an AI model (for chat)
 
-1. Create an API key at https://console.anthropic.com/ (Settings → API keys). Usage is billed by Anthropic.
-2. Open `.env` in the project root and set:
+**Free option: a local model with Ollama.** It runs on your laptop: no account, no cost, and conversations never leave your computer. It's less capable and slower than Claude.
+
+1. Install Ollama from https://ollama.com/download (Windows installer). It runs in the background afterwards.
+2. In PowerShell, download a model (about 2 GB, once):
+   ```bash
+   ollama pull llama3.2
    ```
-   ANTHROPIC_API_KEY=sk-ant-...
+3. Open `.env` (`notepad .env` in the jarvis folder) and set:
    ```
-3. Save the file. (Restart JARVIS if it was running.)
+   JARVIS_AI_PROVIDER=ollama
+   OLLAMA_MODEL=llama3.2
+   ```
+4. Save and restart JARVIS. If your laptop has 16 GB of RAM or more, a bigger model answers better: browse https://ollama.com/library, `ollama pull <name>`, and put that name in `OLLAMA_MODEL`.
+
+**Paid option: Claude** (smartest, best at pushing back). Create a key at https://console.anthropic.com/ (needs billing credit), then set `ANTHROPIC_API_KEY=sk-ant-...` in `.env` and restart.
 
 Without a key, everything except chat and conversation distillation works, and the dashboard says clearly that the model is not connected. It never fakes a reply.
 
@@ -131,6 +140,7 @@ Docs: [ARCHITECTURE](ARCHITECTURE.md) · [MEMORY_SCHEMA](MEMORY_SCHEMA.md) · [S
 | `Python environment not found` | Run `npm run setup`. |
 | `py` not recognised | Reinstall Python with "Add to PATH" ticked, or install from the Microsoft Store. |
 | Red dot in the top bar | Backend isn't running or (if a token is set) this device has no/wrong token — set it in Settings. |
-| Amber dot | Backend fine; AI key missing. |
+| Amber dot | Backend fine; no AI model set up (see step 3). |
+| Chat says "Can't reach Ollama" | Open the Ollama app (or run `ollama serve`). |
 | Port 3000 or 8000 in use | `set PORT=3001` / `set JARVIS_API_PORT=8001` before `npm run dev` (PowerShell: `$env:PORT=3001`). |
 | Phone can't connect | Same Wi-Fi? Used `dev:lan`? Windows firewall allowed Node on private networks? |
